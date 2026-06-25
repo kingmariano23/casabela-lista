@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lista de espera · Casa Bela — por Luane Melo</title>
+<meta name="description" content="Entre na lista. Projetos de arquitetura tradicional para quem cansou de casas quadradas." />
+<link rel="stylesheet" href="assets/brand.css" />
+<style>
+  body{min-height:100vh; display:flex}
+  .split{display:grid; grid-template-columns:1.05fr .95fr; width:100%; min-height:100vh}
+
+  /* ----- lado esquerdo: marca + foto ----- */
+  .aside{
+    position:relative; background:var(--teal); color:var(--cream); overflow:hidden;
+    padding:clamp(34px,4.5vw,68px); display:flex; flex-direction:column; justify-content:space-between; gap:34px;
+  }
+  .aside__bg{position:absolute; inset:0; z-index:0}
+  .aside__bg img{width:100%; height:100%; object-fit:cover; object-position:center 28%;
+    filter:sepia(.22) saturate(.88) contrast(1.02) brightness(.5);}
+  .aside__bg::after{content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(23,58,67,.82), rgba(32,77,88,.74) 48%, rgba(23,58,67,.92));}
+  .aside > *:not(.aside__bg){position:relative; z-index:1}
+  .aside .wordmark b, .aside .wordmark span{color:var(--cream)}
+  .aside .wordmark span{color:var(--rose)}
+  .aside__msg{max-width:460px}
+  .eyebrow{font-size:.68rem; letter-spacing:.4em; text-transform:uppercase; color:var(--sage);
+    margin-bottom:22px; display:flex; align-items:center; gap:13px;}
+  .eyebrow::before{content:""; width:30px; height:1px; background:var(--sage)}
+  .aside h1{font-family:var(--serif); font-weight:400; font-size:clamp(2.2rem,4vw,3.5rem); line-height:1.06; letter-spacing:-.5px; text-shadow:0 2px 30px rgba(23,58,67,.55)}
+  .aside h1 em{font-style:italic; color:var(--rose)}
+  .aside__sub{margin-top:22px; font-size:1.02rem; color:#DCE4E3; max-width:420px}
+  .aside__meta{display:flex; flex-wrap:wrap; gap:9px 24px; font-size:.76rem; color:#B9C8C8}
+  .aside__meta span{display:inline-flex; align-items:center; gap:8px}
+  .aside__meta span::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--rose)}
+
+  /* ----- lado direito: formulário ----- */
+  .panel{display:flex; align-items:center; justify-content:center; padding:clamp(34px,5vw,72px)}
+  .form-box{width:100%; max-width:430px}
+  .form-box .step{font-size:.66rem; letter-spacing:.34em; text-transform:uppercase; color:var(--sage); margin-bottom:16px}
+  .form-box h2{font-family:var(--serif); font-weight:400; font-size:clamp(1.7rem,3vw,2.3rem); color:var(--teal); line-height:1.1; letter-spacing:-.3px}
+  .form-box h2 em{font-style:italic}
+  .form-box .lead{margin-top:14px; margin-bottom:34px; color:var(--ink-soft); font-size:.96rem}
+  .form-box .btn{margin-top:10px}
+  .form-box .legal{margin-top:18px; font-size:.74rem; color:var(--ink-soft); text-align:center}
+
+  /* ----- sucesso ----- */
+  .ok{display:none; text-align:center; animation:rise .7s ease both}
+  .ok.show{display:block}
+  .ok .sym{width:62px; margin:0 auto 24px}
+  .ok h2{font-family:var(--serif); font-weight:400; font-size:clamp(1.8rem,3vw,2.4rem); color:var(--teal); line-height:1.1}
+  .ok h2 em{font-style:italic; color:var(--sage)}
+  .ok p{margin:16px auto 0; max-width:360px; color:var(--ink-soft)}
+  @keyframes rise{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none}}
+
+  @media(max-width:880px){
+    .split{grid-template-columns:1fr}
+    .aside{min-height:42vh}
+    body{display:block}
+  }
+</style>
+</head>
+<body class="grain">
+
+<!-- símbolo -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><symbol id="casa" viewBox="0 0 300 384" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><path d="M150 8 L292 150 L8 150 Z"/><path d="M40 150 V376 H260 V150"/><path d="M80 150 A70 70 0 0 1 220 150"/><path d="M112 150 A38 38 0 0 1 188 150"/><line x1="150" y1="150" x2="150" y2="80"/><line x1="150" y1="150" x2="98" y2="98"/><line x1="150" y1="150" x2="202" y2="98"/><line x1="95" y1="150" x2="95" y2="376"/><line x1="150" y1="150" x2="150" y2="376" stroke-width="5"/><line x1="205" y1="150" x2="205" y2="376"/><line x1="40" y1="306" x2="260" y2="306"/><path d="M40 306 V250 A27.5 27.5 0 0 1 95 250 V306"/><path d="M150 306 V250 A27.5 27.5 0 0 0 95 250"/><path d="M150 306 V250 A27.5 27.5 0 0 1 205 250"/><path d="M205 250 A27.5 27.5 0 0 1 260 250 V306"/></symbol></svg>
+
+<div class="split">
+  <!-- marca -->
+  <aside class="aside">
+    <div class="aside__bg"><img src="assets/luane-hero.jpg" alt="" /></div>
+    <div class="brand">
+      <svg class="sym sym--cream"><use href="#casa"/></svg>
+      <span class="wordmark"><b>Casa<em>Bela</em></b><span>por Luane Melo</span></span>
+    </div>
+    <div class="aside__msg">
+      <p class="eyebrow">Arquitetura tradicional</p>
+      <h1>Sua casa não precisa ser grande.<br>Precisa ser <em>bem pensada.</em></h1>
+      <p class="aside__sub">Entre na lista e seja das primeiras a saber quando abrirmos novas vagas de projeto e consultoria.</p>
+    </div>
+    <div class="aside__meta">
+      <span>Eng. civil + arquiteta</span>
+      <span>Direto com a CEO</span>
+      <span>Projetos pro Brasil 🇧🇷</span>
+    </div>
+  </aside>
+
+  <!-- formulário -->
+  <main class="panel">
+    <div class="form-box">
+      <form id="form" novalidate>
+        <p class="step">Lista de espera</p>
+        <h2>Quero entrar pra <em>lista</em></h2>
+        <p class="lead">Deixe seus dados. A gente te avisa em primeira mão — sem spam, só o que importa.</p>
+
+        <div class="field">
+          <label for="nome">Nome completo</label>
+          <input id="nome" type="text" autocomplete="name" placeholder="Como você se chama?" />
+          <span class="err">Conta pra gente seu nome.</span>
+        </div>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" />
+          <span class="err">Confere o e-mail, parece incompleto.</span>
+        </div>
+        <div class="field">
+          <label for="fone">WhatsApp</label>
+          <input id="fone" type="tel" autocomplete="tel" placeholder="(00) 00000-0000" />
+          <span class="err">Coloca um número com DDD.</span>
+        </div>
+
+        <button class="btn" type="submit" id="btn">
+          Entrar na lista
+          <svg class="arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+        </button>
+        <p class="legal">Seus dados ficam só com a Casa Bela. Nada de spam.</p>
+      </form>
+
+      <div class="ok" id="ok">
+        <svg class="sym"><use href="#casa"/></svg>
+        <h2>Você está na <em>lista.</em></h2>
+        <p>Recebemos seu cadastro. Quando abrirmos as próximas vagas, você é das primeiras a saber. Até já. ✨</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  const form = document.getElementById("form");
+  const btn  = document.getElementById("btn");
+  mascaraFone(document.getElementById("fone"));
+
+  function check(id, fn){
+    const wrap = document.getElementById(id).closest(".field");
+    const ok = fn(document.getElementById(id).value);
+    wrap.classList.toggle("invalid", !ok);
+    return ok;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const a = check("nome", CB.vazio);
+    const b = check("email", CB.email);
+    const c = check("fone", CB.fone);
+    if (!(a && b && c)) return;
+
+    btn.disabled = true; btn.firstChild.textContent = "Enviando…";
+    try{
+      await salvarLead({
+        nome:  document.getElementById("nome").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        telefone: document.getElementById("fone").value.trim(),
+        origem: "landing-lista"
+      });
+      form.style.display = "none";
+      document.getElementById("ok").classList.add("show");
+    }catch(err){
+      console.error(err);
+      btn.disabled = false; btn.firstChild.textContent = "Tentar de novo";
+      alert("Tivemos um probleminha ao enviar. Pode tentar mais uma vez?");
+    }
+  });
+</script>
+</body>
+</html>
