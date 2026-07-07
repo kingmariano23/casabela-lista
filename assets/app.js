@@ -23,12 +23,12 @@ function mascaraFone(el){
 
 /* grava o lead. Resolve sempre — se não houver Supabase configurado,
    entra em "modo demonstração" (não quebra a tela). */
-async function salvarLead({ nome, email, telefone, origem }){
+async function salvarLead({ nome, email, telefone, origem, estilo }){
   const c = window.CASABELA_CONFIG;
   const naoConfig = !c || /SEU-PROJETO|SUA-ANON/.test(c.SUPABASE_URL + c.SUPABASE_ANON_KEY);
 
   if (naoConfig){
-    console.warn("[Casa Bela] Supabase ainda não configurado — modo demonstração. Lead:", { nome, email, telefone, origem });
+    console.warn("[Casa Bela] Supabase ainda não configurado — modo demonstração. Lead:", { nome, email, telefone, origem, estilo });
     await new Promise(r => setTimeout(r, 600)); // simula latência
     return { demo: true };
   }
@@ -41,7 +41,7 @@ async function salvarLead({ nome, email, telefone, origem }){
       "Content-Type": "application/json",
       "Prefer": "return=minimal"
     },
-    body: JSON.stringify({ nome, email, telefone, origem })
+    body: JSON.stringify({ nome, email, telefone, origem, estilo_preferido: estilo })
   });
 
   if (!res.ok){

@@ -96,6 +96,48 @@
         <h2>Quero entrar pra <em>lista</em></h2>
         <p class="lead">Deixe seus dados. A gente te avisa em primeira mão — sem spam, só o que importa.</p>
 
+        <div class="field" id="estilo-wrap">
+          <label>Com qual estilo você mais se identifica?</label>
+          <div class="style-cards">
+            <label class="style-card">
+              <input type="radio" name="estilo" value="Colonial Brasileiro">
+              <div class="sc-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13"/><path d="M14 22v-5a2 2 0 0 0-2-2a2 2 0 0 0-2 2v5"/><path d="M2 10.5 12 3l10 7.5"/></svg>
+                <span>Colonial Brasileiro</span>
+              </div>
+            </label>
+            <label class="style-card">
+              <input type="radio" name="estilo" value="Neoclássico">
+              <div class="sc-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16"/><path d="M4 2h16"/><path d="M6 2v20"/><path d="M18 2v20"/><path d="M10 2v20"/><path d="M14 2v20"/></svg>
+                <span>Neoclássico</span>
+              </div>
+            </label>
+            <label class="style-card">
+              <input type="radio" name="estilo" value="Mediterrâneo">
+              <div class="sc-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9a4 4 0 0 0-8 0v9"/><path d="M20 22v-9a4 4 0 0 0-8 0v9"/><path d="M2 22h20"/></svg>
+                <span>Mediterrâneo / Toscano</span>
+              </div>
+            </label>
+            <label class="style-card">
+              <input type="radio" name="estilo" value="Farmhouse">
+              <div class="sc-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M9 16h6"/></svg>
+                <span>Farmhouse / Rústico</span>
+              </div>
+            </label>
+            <label class="style-card">
+              <input type="radio" name="estilo" value="Contemporâneo">
+              <div class="sc-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22h18"/><path d="M5 22V6h14v16"/><path d="M5 10h14"/><path d="M5 16h14"/></svg>
+                <span>Contemporâneo Quente</span>
+              </div>
+            </label>
+          </div>
+          <span class="err">Selecione um estilo arquitetônico.</span>
+        </div>
+
         <div class="field">
           <label for="nome">Nome completo</label>
           <input id="nome" type="text" autocomplete="name" placeholder="Como você se chama?" />
@@ -121,8 +163,16 @@
 
       <div class="ok" id="ok">
         <svg class="sym"><use href="#casa"/></svg>
-        <h2>Você está na <em>lista.</em></h2>
-        <p>Recebemos seu cadastro. Quando abrirmos as próximas vagas, você é das primeiras a saber. Até já. ✨</p>
+        <h2 style="font-size: clamp(1.4rem, 2.5vw, 1.8rem);">Presente enviado! <br><em>Confira seu e-mail.</em></h2>
+        <p>Seu e-book gratuito acabou de chegar na sua caixa de entrada (dê uma olhadinha no spam também).</p>
+        
+        <div style="margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line);">
+          <h3 style="font-family: var(--serif); font-weight: 400; color: var(--teal); margin-bottom: 12px; font-size: 1.3rem;">Quer dar o próximo passo?</h3>
+          <p style="font-size: 0.9rem; margin-bottom: 22px;">Conheça o nosso material premium com o passo a passo completo para construir com beleza e sem dor de cabeça.</p>
+          <a href="https://kiwify.com.br" class="btn" style="padding: 12px 24px; font-size: 0.8rem; width: auto; background: var(--rose); color: var(--teal-deep);">
+            Ver o Guia Completo
+          </a>
+        </div>
       </div>
     </div>
   </main>
@@ -147,7 +197,18 @@
     const a = check("nome", CB.vazio);
     const b = check("email", CB.email);
     const c = check("fone", CB.fone);
-    if (!(a && b && c)) return;
+    
+    const estiloWrap = document.getElementById("estilo-wrap");
+    const estiloSelecionado = document.querySelector('input[name="estilo"]:checked');
+    let estiloVal = "";
+    if (!estiloSelecionado) {
+      estiloWrap.classList.add("invalid");
+    } else {
+      estiloWrap.classList.remove("invalid");
+      estiloVal = estiloSelecionado.value;
+    }
+
+    if (!(a && b && c && estiloSelecionado)) return;
 
     btn.disabled = true; btn.firstChild.textContent = "Enviando…";
     try{
@@ -155,7 +216,8 @@
         nome:  document.getElementById("nome").value.trim(),
         email: document.getElementById("email").value.trim(),
         telefone: document.getElementById("fone").value.trim(),
-        origem: "landing-lista"
+        origem: "landing-lista",
+        estilo: estiloVal
       });
       form.style.display = "none";
       document.getElementById("ok").classList.add("show");
