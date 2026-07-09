@@ -3,227 +3,496 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lista de espera · Casa Bela — por Luane Melo</title>
-<meta name="description" content="Entre na lista. Projetos de arquitetura tradicional para quem cansou de casas quadradas." />
+<title>Diagnóstico do Lar · Casa Bela — por Luane Melo</title>
+<meta name="description" content="Descubra a vocação da sua casa. Diagnóstico rápido e gratuito." />
 <link rel="stylesheet" href="assets/brand.css" />
 <style>
-  body{min-height:100vh; display:flex}
-  .split{display:grid; grid-template-columns:1.05fr .95fr; width:100%; min-height:100vh}
+  body{min-height:100vh; min-height:100svh; display:flex; flex-direction:column; background:var(--cream)}
 
-  /* ----- lado esquerdo: marca + foto ----- */
-  .aside{
-    position:relative; background:var(--teal); color:var(--cream); overflow:hidden;
-    padding:clamp(34px,4.5vw,68px); display:flex; flex-direction:column; justify-content:space-between; gap:34px;
+  /* topo: marca + progresso */
+  .top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:clamp(22px,3vw,34px) clamp(24px,5vw,56px);
   }
-  .aside__bg{position:absolute; inset:0; z-index:0}
-  .aside__bg img{width:100%; height:100%; object-fit:cover; object-position:center 28%;
-    filter:sepia(.22) saturate(.88) contrast(1.02) brightness(.5);}
-  .aside__bg::after{content:""; position:absolute; inset:0;
-    background:linear-gradient(180deg, rgba(23,58,67,.82), rgba(32,77,88,.74) 48%, rgba(23,58,67,.92));}
-  .aside > *:not(.aside__bg){position:relative; z-index:1}
-  .aside .wordmark b, .aside .wordmark span{color:var(--cream)}
-  .aside .wordmark span{color:var(--rose)}
-  .aside__msg{max-width:460px}
-  .eyebrow{font-size:.68rem; letter-spacing:.4em; text-transform:uppercase; color:var(--sage);
-    margin-bottom:22px; display:flex; align-items:center; gap:13px;}
-  .eyebrow::before{content:""; width:30px; height:1px; background:var(--sage)}
-  .aside h1{font-family:var(--serif); font-weight:400; font-size:clamp(2.2rem,4vw,3.5rem); line-height:1.06; letter-spacing:-.5px; text-shadow:0 2px 30px rgba(23,58,67,.55)}
-  .aside h1 em{font-style:italic; color:var(--rose)}
-  .aside__sub{margin-top:22px; font-size:1.02rem; color:#DCE4E3; max-width:420px}
-  .aside__meta{display:flex; flex-wrap:wrap; gap:9px 24px; font-size:.76rem; color:#B9C8C8}
-  .aside__meta span{display:inline-flex; align-items:center; gap:8px}
-  .aside__meta span::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--rose)}
+  .top .wordmark b{color:var(--teal)} .top .wordmark span{color:var(--sage)}
+  .progress-track{width:140px; height:4px; background:var(--line); border-radius:4px; overflow:hidden}
+  .progress-fill{height:100%; background:var(--teal); border-radius:4px; transition:width .6s cubic-bezier(.4,0,.2,1)}
 
-  /* ----- lado direito: formulário ----- */
-  .panel{display:flex; align-items:center; justify-content:center; padding:clamp(34px,5vw,72px)}
-  .form-box{width:100%; max-width:430px}
-  .form-box .step{font-size:.66rem; letter-spacing:.34em; text-transform:uppercase; color:var(--sage); margin-bottom:16px}
-  .form-box h2{font-family:var(--serif); font-weight:400; font-size:clamp(1.7rem,3vw,2.3rem); color:var(--teal); line-height:1.1; letter-spacing:-.3px}
-  .form-box h2 em{font-style:italic}
-  .form-box .lead{margin-top:14px; margin-bottom:34px; color:var(--ink-soft); font-size:.96rem}
-  .form-box .btn{margin-top:10px}
-  .form-box .legal{margin-top:18px; font-size:.74rem; color:var(--ink-soft); text-align:center}
+  /* palco das perguntas */
+  .stage{flex:1; display:flex; align-items:center; justify-content:center; padding:24px clamp(24px,6vw,56px) 8vh}
+  .steps{width:100%; max-width:620px; position:relative; min-height:340px}
 
-  /* ----- sucesso ----- */
-  .ok{display:none; text-align:center; animation:rise .7s ease both}
-  .ok.show{display:block}
-  .ok .sym{width:62px; margin:0 auto 24px}
-  .ok h2{font-family:var(--serif); font-weight:400; font-size:clamp(1.8rem,3vw,2.4rem); color:var(--teal); line-height:1.1}
-  .ok h2 em{font-style:italic; color:var(--sage)}
-  .ok p{margin:16px auto 0; max-width:360px; color:var(--ink-soft)}
-  @keyframes rise{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none}}
-
-  @media(max-width:880px){
-    .split{grid-template-columns:1fr}
-    .aside{min-height:42vh}
-    body{display:block}
+  .step{
+    position:absolute; inset:0; opacity:0; visibility:hidden; pointer-events:none;
+    transform:translateY(26px); transition:opacity .5s ease, transform .55s cubic-bezier(.2,.7,.2,1);
   }
+  .step.active{position:relative; opacity:1; visibility:visible; pointer-events:auto; transform:none}
+  .step.leaving{opacity:0; transform:translateY(-24px)}
+
+  .qcount{font-family:var(--serif); font-style:italic; font-size:1.1rem; color:var(--rose); margin-bottom:14px;
+    display:flex; align-items:center; gap:10px}
+  .qcount::after{content:""; width:26px; height:1px; background:var(--rose)}
+  .step h2{font-family:var(--serif); font-weight:400; font-size:clamp(1.6rem,4vw,2.6rem); line-height:1.12;
+    color:var(--teal); letter-spacing:-.5px; text-align:center}
+  .step h2 em{font-style:italic; color:var(--sage)}
+
+  /* opções do quiz */
+  .quiz-options{display:flex; flex-direction:column; gap:12px; margin-top:28px}
+  .quiz-opt{
+    width:100%; text-align:left; background:transparent;
+    border:1.5px solid var(--line); border-radius:8px; padding:16px 20px; cursor:pointer;
+    font-family:var(--sans); font-size:1rem; font-weight:400; color:var(--ink);
+    display:flex; align-items:center; gap:16px; transition:all .25s ease;
+  }
+  .quiz-opt:hover{border-color:var(--teal); background:rgba(32,77,88,.03)}
+  .quiz-opt.selected{border-color:var(--teal); background:var(--teal); color:var(--cream)}
+  .quiz-opt .opt-icon{
+    width:32px; height:32px; border-radius:50%; border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .25s ease;
+  }
+  .quiz-opt:hover .opt-icon{border-color:var(--teal)}
+  .quiz-opt.selected .opt-icon{border-color:var(--cream); background:rgba(255,255,255,.15)}
+  .quiz-opt .opt-icon svg{width:14px; height:14px; opacity:.4; transition:.25s}
+  .quiz-opt.selected .opt-icon svg{opacity:1}
+
+  /* gender cards */
+  .gender-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:28px}
+  .gender-card{
+    border:1.5px solid var(--line); border-radius:12px; overflow:hidden; cursor:pointer;
+    transition:all .3s ease; background:white; display:flex; flex-direction:column;
+  }
+  .gender-card:hover{border-color:var(--teal); transform:translateY(-3px); box-shadow:0 12px 28px -8px rgba(32,77,88,.12)}
+  .gender-card.selected{border-color:var(--teal); box-shadow:0 12px 28px -8px rgba(32,77,88,.2)}
+  .gender-card img{width:100%; aspect-ratio:3/4; object-fit:cover; object-position:center 20%;
+    filter:sepia(.12) saturate(.9) brightness(1.02)}
+  .gender-card .gc-label{
+    padding:14px 18px; font-family:var(--sans); font-weight:500; font-size:1rem; color:var(--ink);
+    display:flex; align-items:center; gap:12px; transition:.25s;
+  }
+  .gender-card.selected .gc-label{background:var(--teal); color:var(--cream)}
+  .gender-card .gc-dot{
+    width:22px; height:22px; border-radius:50%; border:1.5px solid var(--line); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; transition:.25s;
+  }
+  .gender-card.selected .gc-dot{border-color:var(--cream); background:rgba(255,255,255,.2)}
+  .gender-card .gc-dot svg{width:12px; height:12px; opacity:0; transition:.2s}
+  .gender-card.selected .gc-dot svg{opacity:1}
+
+  /* inputs */
+  .step input{
+    width:100%; font-family:var(--serif); font-size:clamp(1.4rem,3vw,2rem); font-weight:400; color:var(--ink);
+    background:transparent; border:none; border-bottom:1.6px solid var(--line);
+    padding:14px 2px; margin-top:30px; transition:.3s;
+  }
+  .step input:focus{outline:none; border-bottom-color:var(--teal)}
+  .step input::placeholder{color:#C3BBB0; font-style:italic}
+  .step .hint{margin-top:12px; color:var(--ink-soft); font-size:.96rem; text-align:center}
+  .step .row{display:flex; align-items:center; gap:18px; margin-top:30px; flex-wrap:wrap; justify-content:center}
+  .step .btn{width:auto; padding:16px 38px}
+  .step .enter{font-size:.74rem; letter-spacing:.06em; color:var(--ink-soft)}
+  .step .enter b{color:var(--teal); font-weight:500}
+  .step .err{display:none; color:#B5544C; font-size:.84rem; margin-top:14px; text-align:center}
+  .step.invalid .err{display:block}
+  .step.invalid input{border-bottom-color:#B5544C}
+
+  /* loading screen */
+  .loading-screen{text-align:center; padding:4rem 0}
+  .loading-bar{width:60%; max-width:300px; height:6px; background:var(--line); border-radius:3px; margin:0 auto 32px; overflow:hidden}
+  .loading-bar-fill{height:100%; background:var(--teal); border-radius:3px; transition:width 1.2s ease}
+  .loading-msg{font-family:var(--serif); font-style:italic; font-size:1.3rem; color:var(--teal); min-height:2em}
+
+  /* resultado */
+  .result-card{
+    background:white; border:1.5px solid var(--line); border-radius:12px;
+    padding:28px; margin-top:24px; text-align:center;
+  }
+  .result-card .result-level{
+    font-family:var(--serif); font-style:italic; font-size:1.8rem; color:var(--teal); margin-bottom:8px;
+  }
+  .result-card p{color:var(--ink-soft); font-size:.95rem; line-height:1.6}
+
+  /* sucesso */
+  .done{display:none; text-align:center; max-width:520px; margin:0 auto; animation:rise .8s ease both}
+  .done.show{display:block}
+  .done .sym{width:70px; margin:0 auto 28px}
+  .done h2{font-family:var(--serif); font-weight:400; font-size:clamp(2rem,4.5vw,3rem); color:var(--teal); line-height:1.08}
+  .done h2 em{font-style:italic; color:var(--sage)}
+  .done p{margin:18px auto 0; max-width:380px; color:var(--ink-soft)}
+
+  /* upsell */
+  .upsell{margin-top:34px; padding-top:24px; border-top:1px solid var(--line)}
+  .upsell h3{font-family:var(--serif); font-weight:400; color:var(--teal); margin-bottom:12px; font-size:1.3rem}
+  .upsell p{font-size:.9rem; margin-bottom:22px}
+  .upsell .btn-upsell{
+    padding:14px 28px; font-size:.85rem; width:auto; background:var(--rose); color:var(--teal-deep);
+    border:none; border-radius:46px; cursor:pointer; font-family:var(--sans); font-weight:500;
+    letter-spacing:.1em; text-transform:uppercase; display:inline-flex; align-items:center; gap:10px;
+    transition:.3s; text-decoration:none;
+    box-shadow:0 12px 24px -8px rgba(224,195,195,.5);
+  }
+  .upsell .btn-upsell:hover{transform:translateY(-2px); box-shadow:0 16px 30px -8px rgba(224,195,195,.6)}
+
+  @keyframes rise{from{opacity:0; transform:translateY(20px)} to{opacity:1; transform:none}}
+  @media(max-width:560px){ .stage{align-items:flex-start; padding-top:6vh} .gender-grid{gap:12px} }
 </style>
 </head>
 <body class="grain">
 
-<!-- símbolo -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg"><symbol id="casa" viewBox="0 0 300 384" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><path d="M150 8 L292 150 L8 150 Z"/><path d="M40 150 V376 H260 V150"/><path d="M80 150 A70 70 0 0 1 220 150"/><path d="M112 150 A38 38 0 0 1 188 150"/><line x1="150" y1="150" x2="150" y2="80"/><line x1="150" y1="150" x2="98" y2="98"/><line x1="150" y1="150" x2="202" y2="98"/><line x1="95" y1="150" x2="95" y2="376"/><line x1="150" y1="150" x2="150" y2="376" stroke-width="5"/><line x1="205" y1="150" x2="205" y2="376"/><line x1="40" y1="306" x2="260" y2="306"/><path d="M40 306 V250 A27.5 27.5 0 0 1 95 250 V306"/><path d="M150 306 V250 A27.5 27.5 0 0 0 95 250"/><path d="M150 306 V250 A27.5 27.5 0 0 1 205 250"/><path d="M205 250 A27.5 27.5 0 0 1 260 250 V306"/></symbol></svg>
 
-<div class="split">
-  <!-- marca -->
-  <aside class="aside">
-    <div class="aside__bg"><img src="assets/luane-hero.jpg" alt="" /></div>
-    <div class="brand">
-      <svg class="sym sym--cream"><use href="#casa"/></svg>
-      <span class="wordmark"><b>Casa<em>Bela</em></b><span>por Luane Melo</span></span>
-    </div>
-    <div class="aside__msg">
-      <p class="eyebrow">Arquitetura tradicional</p>
-      <h1>Sua casa não precisa ser grande.<br>Precisa ser <em>bem pensada.</em></h1>
-      <p class="aside__sub">Entre na lista e seja das primeiras a saber quando abrirmos novas vagas de projeto e consultoria.</p>
-    </div>
-    <div class="aside__meta">
-      <span>Eng. civil + arquiteta</span>
-      <span>Direto com a CEO</span>
-      <span>Projetos pro Brasil 🇧🇷</span>
-    </div>
-  </aside>
+<header class="top">
+  <div class="brand">
+    <svg class="sym"><use href="#casa"/></svg>
+    <span class="wordmark"><b>Casa<em>Bela</em></b><span>por Luane Melo</span></span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</header>
 
-  <!-- formulário -->
-  <main class="panel">
-    <div class="form-box">
-      <form id="form" novalidate>
-        <p class="step">Lista de espera</p>
-        <h2>Quero entrar pra <em>lista</em></h2>
-        <p class="lead">Deixe seus dados. A gente te avisa em primeira mão — sem spam, só o que importa.</p>
+<main class="stage">
+  <div class="steps" id="steps">
 
-        <div class="field" id="estilo-wrap">
-          <label>Com qual estilo você mais se identifica?</label>
-          <div class="style-cards">
-            <label class="style-card">
-              <input type="radio" name="estilo" value="Colonial Brasileiro">
-              <div class="sc-content">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13"/><path d="M14 22v-5a2 2 0 0 0-2-2a2 2 0 0 0-2 2v5"/><path d="M2 10.5 12 3l10 7.5"/></svg>
-                <span>Colonial Brasileiro</span>
-              </div>
-            </label>
-            <label class="style-card">
-              <input type="radio" name="estilo" value="Neoclássico">
-              <div class="sc-content">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16"/><path d="M4 2h16"/><path d="M6 2v20"/><path d="M18 2v20"/><path d="M10 2v20"/><path d="M14 2v20"/></svg>
-                <span>Neoclássico</span>
-              </div>
-            </label>
-            <label class="style-card">
-              <input type="radio" name="estilo" value="Mediterrâneo">
-              <div class="sc-content">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9a4 4 0 0 0-8 0v9"/><path d="M20 22v-9a4 4 0 0 0-8 0v9"/><path d="M2 22h20"/></svg>
-                <span>Mediterrâneo / Toscano</span>
-              </div>
-            </label>
-            <label class="style-card">
-              <input type="radio" name="estilo" value="Farmhouse">
-              <div class="sc-content">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M9 16h6"/></svg>
-                <span>Farmhouse / Rústico</span>
-              </div>
-            </label>
-            <label class="style-card">
-              <input type="radio" name="estilo" value="Contemporâneo">
-              <div class="sc-content">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22h18"/><path d="M5 22V6h14v16"/><path d="M5 10h14"/><path d="M5 16h14"/></svg>
-                <span>Contemporâneo Quente</span>
-              </div>
-            </label>
+    <!-- Q1 · gênero (com imagens) -->
+    <section class="step active" data-type="gender" id="step-0">
+      <p class="qcount">01 — pra começar</p>
+      <h2>Diagnóstico do <em>Lar</em></h2>
+      <p class="hint">Selecione como prefere ser tratada(o) ao longo do diagnóstico.</p>
+      <div class="gender-grid">
+        <div class="gender-card" data-val="Mulher" onclick="selectGender(this)">
+          <img src="assets/mulher.png" alt="Mulher" />
+          <div class="gc-label">
+            <div class="gc-dot"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div>
+            Mulher
           </div>
-          <span class="err">Selecione um estilo arquitetônico.</span>
         </div>
-
-        <div class="field">
-          <label for="nome">Nome completo</label>
-          <input id="nome" type="text" autocomplete="name" placeholder="Como você se chama?" />
-          <span class="err">Conta pra gente seu nome.</span>
-        </div>
-        <div class="field">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" />
-          <span class="err">Confere o e-mail, parece incompleto.</span>
-        </div>
-        <div class="field">
-          <label for="fone">WhatsApp</label>
-          <input id="fone" type="tel" autocomplete="tel" placeholder="(00) 00000-0000" />
-          <span class="err">Coloca um número com DDD.</span>
-        </div>
-
-        <button class="btn" type="submit" id="btn">
-          Entrar na lista
-          <svg class="arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
-        </button>
-        <p class="legal">Seus dados ficam só com a Casa Bela. Nada de spam.</p>
-      </form>
-
-      <div class="ok" id="ok">
-        <svg class="sym"><use href="#casa"/></svg>
-        <h2 style="font-size: clamp(1.4rem, 2.5vw, 1.8rem);">Presente enviado! <br><em>Confira seu e-mail.</em></h2>
-        <p>Seu e-book gratuito acabou de chegar na sua caixa de entrada (dê uma olhadinha no spam também).</p>
-        
-        <div style="margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line);">
-          <h3 style="font-family: var(--serif); font-weight: 400; color: var(--teal); margin-bottom: 12px; font-size: 1.3rem;">Quer dar o próximo passo?</h3>
-          <p style="font-size: 0.9rem; margin-bottom: 22px;">Conheça o nosso material premium com o passo a passo completo para construir com beleza e sem dor de cabeça.</p>
-          <a href="https://kiwify.com.br" class="btn" style="padding: 12px 24px; font-size: 0.8rem; width: auto; background: var(--rose); color: var(--teal-deep);">
-            Ver o Guia Completo
-          </a>
+        <div class="gender-card" data-val="Homem" onclick="selectGender(this)">
+          <img src="assets/homem.png" alt="Homem" />
+          <div class="gc-label">
+            <div class="gc-dot"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div>
+            Homem
+          </div>
         </div>
       </div>
-    </div>
-  </main>
-</div>
+      <p class="hint" style="margin-top:20px; font-size:.78rem">O diagnóstico leva cerca de 2 minutos.</p>
+    </section>
+
+    <!-- Q2 · representação -->
+    <section class="step" data-type="quiz" id="step-1">
+      <p class="qcount">02 — sobre o seu lar</p>
+      <h2>Você sente que a sua casa <em>te representa</em> hoje?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Não me representa em nada</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Representa muito pouco</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Mais ou menos — é neutra</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Sim, reflete minha história</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Totalmente, é a nossa cara</button>
+      </div>
+    </section>
+
+    <!-- Q3 · tempo sem melhorias -->
+    <section class="step" data-type="quiz" id="step-2">
+      <p class="qcount">03 — manutenção</p>
+      <h2>Há quanto tempo a sua casa não recebe uma <em>melhoria intencional?</em></h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Nunca fiz ou não lembro da última vez</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Há mais de 5 anos</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Entre 3 e 5 anos</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Entre 1 e 2 anos</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Fiz recentemente (menos de 1 ano)</button>
+      </div>
+    </section>
+
+    <!-- Q4 · acolhimento -->
+    <section class="step" data-type="quiz" id="step-3">
+      <p class="qcount">04 — acolhimento</p>
+      <h2>Quando você chega em casa, sente que ela <em>abraça</em> a sua família?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Muito fria, não me sinto acolhida</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Mais fria do que acolhedora</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Nem fria, nem acolhedora</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Mais acolhedora do que fria</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Muito acolhedora — me sinto abraçada pela casa</button>
+      </div>
+    </section>
+
+    <!-- Q5 · funcionalidade -->
+    <section class="step" data-type="quiz" id="step-4">
+      <p class="qcount">05 — funcionalidade</p>
+      <h2>A disposição da sua casa funciona pra <em>vida real</em> da sua família?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Nada funcional — vivemos esbarrando nos móveis</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Pouco funcional — até parece bonita, mas é imprática</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Razoável — algumas coisas funcionam, outras não</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Funciona bem — poucas queixas</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Perfeita — cada canto foi pensado pra gente</button>
+      </div>
+    </section>
+
+    <!-- Q6 · beleza -->
+    <section class="step" data-type="quiz" id="step-5">
+      <p class="qcount">06 — beleza</p>
+      <h2>A estética da sua casa traz <em>paz visual,</em> ou gera cansaço?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Gera cansaço — mistura de estilos sem identidade</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Indiferente — não sinto nada olhando pra ela</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Razoável — tem partes bonitas e partes que me incomodam</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Traz paz — é harmônica no geral</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Traz muita paz — a beleza da casa me restaura</button>
+      </div>
+    </section>
+
+    <!-- Q7 · estrutura -->
+    <section class="step" data-type="quiz" id="step-6">
+      <p class="qcount">07 — estrutura</p>
+      <h2>A estrutura da sua casa traz <em>segurança,</em> ou você vive apagando incêndios?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Muitos problemas — infiltração, rachaduras, elétrica</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Problemas frequentes — sempre tem algo pra resolver</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Um ou outro problema pontual</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Estrutura boa — poucas manutenções</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Sólida — confio totalmente nela</button>
+      </div>
+    </section>
+
+    <!-- Q8 · descanso -->
+    <section class="step" data-type="quiz" id="step-7">
+      <p class="qcount">08 — refúgio</p>
+      <h2>A sua casa é um verdadeiro <em>refúgio de descanso</em> pra sua família?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Não — prefiro estar em qualquer outro lugar</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Muito pouco — é mais um lugar de passar do que de ficar</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Às vezes — depende do cômodo e do dia</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Sim — gosto de estar em casa</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Com certeza — é meu refúgio sagrado</button>
+      </div>
+    </section>
+
+    <!-- Q9 · medo -->
+    <section class="step" data-type="quiz" id="step-8">
+      <p class="qcount">09 — seus receios</p>
+      <h2>Qual o seu maior <em>medo</em> na hora de pensar em construir ou reformar?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Estourar o orçamento e perder o controle</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Errar na estética e me arrepender depois</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Ficar com uma casa fria e sem alma</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Ter dor de cabeça com obra e pedreiro</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Não tenho medo — quero começar logo</button>
+      </div>
+    </section>
+
+    <!-- Q10 · futuro -->
+    <section class="step" data-type="quiz" id="step-9">
+      <p class="qcount">10 — olhando pra frente</p>
+      <h2>Se nada mudasse na sua casa nos próximos 5 anos, como isso <em>impactaria</em> sua família?</h2>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Seria muito frustrante — não aguento mais assim</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Afetaria bastante nossa convivência</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Incomodaria, mas a gente iria levando</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Não impactaria muito — está ok assim</button>
+        <button class="quiz-opt" onclick="selectOpt(this)"><div class="opt-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg></div> Zero impacto — estou satisfeita</button>
+      </div>
+    </section>
+
+    <!-- loading -->
+    <section class="step" data-type="loading" id="step-loading">
+      <div class="loading-screen">
+        <svg class="sym" style="width:60px; margin:0 auto 32px; display:block"><use href="#casa"/></svg>
+        <div class="loading-bar"><div class="loading-bar-fill" id="loadingFill" style="width:0%"></div></div>
+        <p class="loading-msg" id="loadingMsg">Analisando suas respostas…</p>
+      </div>
+    </section>
+
+    <!-- resultado + captura -->
+    <section class="step" data-type="result" id="step-result">
+      <h2>Seu diagnóstico está <em>pronto.</em></h2>
+      <div class="result-card" id="resultCard">
+        <p class="result-level" id="resultLevel"></p>
+        <p id="resultText"></p>
+      </div>
+      <p class="hint" style="margin-top:28px">Baixe gratuitamente o guia <strong>"Os 5 Pilares de uma Casa que Acolhe"</strong> e comece a transformação.</p>
+      <div style="max-width:380px; margin:24px auto 0">
+        <div class="field"><label for="nome">Nome</label><input id="nome" type="text" autocomplete="name" placeholder="Como você se chama?" /><span class="err">Conta pra gente seu nome.</span></div>
+        <div class="field"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" placeholder="voce@email.com" /><span class="err">Confere o e-mail, parece incompleto.</span></div>
+        <div class="field"><label for="fone">WhatsApp</label><input id="fone" type="tel" autocomplete="tel" placeholder="(00) 00000-0000" /><span class="err">Coloca um número com DDD.</span></div>
+        <button class="btn" type="button" id="btnCapture" onclick="submitLead()">
+          Baixar meu guia gratuito
+          <svg class="arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+        </button>
+        <p style="margin-top:14px; font-size:.74rem; color:var(--ink-soft); text-align:center">Seus dados ficam só com a Casa Bela. Nada de spam.</p>
+      </div>
+    </section>
+
+    <!-- sucesso -->
+    <section class="done" id="done">
+      <svg class="sym"><use href="#casa"/></svg>
+      <h2>Presente enviado! <br><em>Confira seu e-mail.</em></h2>
+      <p>Seu guia gratuito acabou de chegar na sua caixa de entrada (dê uma olhadinha no spam também).</p>
+      <div class="upsell">
+        <h3>Quer dar o próximo passo?</h3>
+        <p>Conheça o material premium com o passo a passo completo para construir com beleza e previsibilidade — o jeito Casa Bela de projetar.</p>
+        <a href="#" class="btn-upsell">
+          Ver o Guia Completo
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+    </section>
+
+  </div>
+</main>
 
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-  const form = document.getElementById("form");
-  const btn  = document.getElementById("btn");
+  const TOTAL_QUIZ = 10; // perguntas do quiz (steps 0-9)
+  const answers = {};
+  let current = 0;
+
+  const fill = document.getElementById("progressFill");
+
+  function updateProgress(){
+    fill.style.width = ((current + 1) / (TOTAL_QUIZ + 2)) * 100 + "%";
+  }
+  updateProgress();
+
+  /* ---- transição ---- */
+  function transicao(from, to){
+    from.classList.add("leaving");
+    setTimeout(() => {
+      from.classList.remove("active","leaving");
+      to.classList.add("active");
+      const inp = to.querySelector("input");
+      if(inp) setTimeout(() => inp.focus(), 80);
+    }, 400);
+  }
+
+  /* ---- gênero ---- */
+  function selectGender(card){
+    document.querySelectorAll(".gender-card").forEach(c => c.classList.remove("selected"));
+    card.classList.add("selected");
+    answers[0] = card.dataset.val;
+    setTimeout(() => advance(), 500);
+  }
+
+  /* ---- opção de quiz ---- */
+  function selectOpt(btn){
+    btn.closest(".quiz-options").querySelectorAll(".quiz-opt").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    answers[current] = btn.textContent.trim();
+    setTimeout(() => advance(), 500);
+  }
+
+  /* ---- avançar ---- */
+  function advance(){
+    const fromStep = document.getElementById("step-" + current);
+    current++;
+    updateProgress();
+
+    if(current < TOTAL_QUIZ){
+      const toStep = document.getElementById("step-" + current);
+      transicao(fromStep, toStep);
+    } else {
+      // vai pro loading
+      const loadingStep = document.getElementById("step-loading");
+      transicao(fromStep, loadingStep);
+      runLoading();
+    }
+  }
+
+  /* ---- loading animado ---- */
+  function runLoading(){
+    const bar = document.getElementById("loadingFill");
+    const msg = document.getElementById("loadingMsg");
+    const msgs = [
+      "Analisando suas respostas…",
+      "Calculando o nível de acolhimento do seu lar…",
+      "Montando seu diagnóstico personalizado…"
+    ];
+    let idx = 0; let pct = 0;
+    msg.textContent = msgs[0];
+
+    const interval = setInterval(() => {
+      pct += 4;
+      bar.style.width = Math.min(pct, 100) + "%";
+      if(pct === 36){ idx=1; msg.textContent = msgs[1]; }
+      if(pct === 72){ idx=2; msg.textContent = msgs[2]; }
+      if(pct >= 100){
+        clearInterval(interval);
+        setTimeout(() => showResult(), 600);
+      }
+    }, 80);
+  }
+
+  /* ---- resultado ---- */
+  function showResult(){
+    // Calcula score simples (média inversa — opções vão de "pior" a "melhor")
+    let score = 0; let count = 0;
+    for(let i=1; i<TOTAL_QUIZ; i++){
+      if(answers[i] !== undefined){
+        const step = document.getElementById("step-" + i);
+        const opts = [...step.querySelectorAll(".quiz-opt")];
+        const idx = opts.findIndex(o => o.classList.contains("selected") || o.textContent.trim() === answers[i]);
+        score += idx; count++;
+      }
+    }
+    const avg = count > 0 ? score / count : 2;
+    const levels = [
+      {name:"Crítico",    text:"Sua casa pede atenção urgente. Há uma desconexão grande entre o que você vive e o que o seu lar expressa. A boa notícia: reconhecer isso é o primeiro passo pra construir um lar com beleza e sentido."},
+      {name:"Confuso",    text:"Você se sente confusa em relação à própria casa. As escolhas se acumulam sem direção, e nada parece plenamente resolvido. Isso gera cansaço mental e a sensação constante de que algo ficou pendente."},
+      {name:"Em transição",text:"Sua casa tem potencial, mas falta intencionalidade. Com as escolhas certas — de quem entende de beleza que funciona — ela pode virar o refúgio que a sua família merece."},
+      {name:"Acolhedor",  text:"Seu lar já tem uma boa base de acolhimento. Algumas mudanças pontuais podem elevar essa sensação e criar um espaço que reflete ainda mais quem vocês são como família."},
+      {name:"Pleno",      text:"Parabéns! Sua casa já é um lar no sentido mais profundo da palavra — um refúgio que acolhe, restaura e conta a história da sua família com beleza."}
+    ];
+    const level = levels[Math.min(Math.floor(avg), 4)];
+
+    document.getElementById("resultLevel").textContent = level.name;
+    document.getElementById("resultText").textContent = level.text;
+
+    const from = document.getElementById("step-loading");
+    const to = document.getElementById("step-result");
+    fill.style.width = "85%";
+    transicao(from, to);
+  }
+
+  /* ---- captura do lead ---- */
   mascaraFone(document.getElementById("fone"));
 
-  function check(id, fn){
-    const wrap = document.getElementById(id).closest(".field");
-    const ok = fn(document.getElementById(id).value);
+  function checkField(id, fn){
+    const el = document.getElementById(id);
+    const wrap = el.closest(".field");
+    const ok = fn(el.value);
     wrap.classList.toggle("invalid", !ok);
     return ok;
   }
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const a = check("nome", CB.vazio);
-    const b = check("email", CB.email);
-    const c = check("fone", CB.fone);
-    
-    const estiloWrap = document.getElementById("estilo-wrap");
-    const estiloSelecionado = document.querySelector('input[name="estilo"]:checked');
-    let estiloVal = "";
-    if (!estiloSelecionado) {
-      estiloWrap.classList.add("invalid");
-    } else {
-      estiloWrap.classList.remove("invalid");
-      estiloVal = estiloSelecionado.value;
-    }
+  async function submitLead(){
+    const a = checkField("nome", CB.vazio);
+    const b = checkField("email", CB.email);
+    const c = checkField("fone", CB.fone);
+    if(!(a && b && c)) return;
 
-    if (!(a && b && c && estiloSelecionado)) return;
-
+    const btn = document.getElementById("btnCapture");
     btn.disabled = true; btn.firstChild.textContent = "Enviando…";
+
     try{
       await salvarLead({
-        nome:  document.getElementById("nome").value.trim(),
+        nome: document.getElementById("nome").value.trim(),
         email: document.getElementById("email").value.trim(),
         telefone: document.getElementById("fone").value.trim(),
-        origem: "landing-casabela",
-        estilo: estiloVal
+        origem: "diagnostico-lar",
+        estilo: answers[0] || ""
       });
-      form.style.display = "none";
-      document.getElementById("ok").classList.add("show");
-    }catch(err){
+
+      const from = document.getElementById("step-result");
+      from.classList.add("leaving");
+      setTimeout(() => {
+        from.classList.remove("active","leaving");
+        document.getElementById("done").classList.add("show");
+        fill.style.width = "100%";
+      }, 400);
+    } catch(err){
       console.error(err);
       btn.disabled = false; btn.firstChild.textContent = "Tentar de novo";
-      alert("Tivemos um probleminha ao enviar. Pode tentar mais uma vez?");
     }
-  });
+  }
 </script>
 </body>
 </html>
